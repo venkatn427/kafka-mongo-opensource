@@ -1,0 +1,11 @@
+FROM apache/superset:latest
+
+COPY superset_setup.py /app/superset_setup.py
+COPY config/superset_config.py /app/pythonpath/
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+COPY init.sh /app/init.sh
+
+RUN chmod +x /app/docker-entrypoint.sh /app/init.sh
+
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["superset", "run", "-h", "0.0.0.0", "-p", "8088"]

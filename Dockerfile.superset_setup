@@ -1,0 +1,9 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY superset_setup.py /app/superset_setup.py
+
+RUN pip install requests
+
+CMD ["python", "superset_setup.py"]

@@ -1,0 +1,37 @@
+version: 1
+databases:
+  - database_name: superset_metrics_db
+    sqlalchemy_uri: postgresql+psycopg2://superset:superset@db:5432/superset_metrics_db
+datasets:
+  - dataset_name: metrics
+    database_name: superset_metrics_db
+    schema: public
+    sql: |
+      SELECT
+        metric_name,
+        metric_value,
+        updated_at
+      FROM metrics
+charts:
+  - chart_name: Number of Employees
+    dataset_name: metrics
+    viz_type: big_number
+    params:
+      metric: metric_value
+      adhoc_filters:
+        - clause: WHERE metric_name = 'num_employees'
+    datasource_type: table
+  - chart_name: Number of Departments
+    dataset_name: metrics
+    viz_type: big_number
+    params:
+      metric: metric_value
+      adhoc_filters:
+        - clause: WHERE metric_name = 'num_departments'
+    datasource_type: table
+dashboards:
+  - dashboard_title: Company Metrics
+    slug: company_metrics
+    charts:
+      - Number of Employees
+      - Number of Departments

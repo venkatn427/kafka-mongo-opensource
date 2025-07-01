@@ -1,0 +1,5 @@
+# example for all three, adjust as per your code
+psycopg2-binary
+pymongo
+kafka-python
+PyYAML
