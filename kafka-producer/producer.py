@@ -27,8 +27,10 @@ def setup_producer():
 
     raise Exception("❌ Failed to connect to Kafka after retries.")
 
-# === Event Generator Logic ===
-def generate_event(producer):
+# === Main Producer Logic ===
+def main():
+    producer = setup_producer()
+
     topics = {
         "employees": EmployeeGenerator,
         "departments": DepartmentGenerator,
@@ -37,17 +39,11 @@ def generate_event(producer):
         "attendance": AttendanceGenerator
     }
 
-    topic = random.choice(list(topics.keys()))
-    data = topics[topic].generate()
-    producer.send(topic, value=data)
-    print(f"📤 Sent to {topic}: {data}")
-
-# === Main Logic ===
-def main():
-    producer = setup_producer()
-
     while True:
-        generate_event(producer)
+        topic = random.choice(list(topics.keys()))
+        data = topics[topic].generate()
+        producer.send(topic, value=data)
+        print(f"📤 Sent to {topic}: {data}")
         time.sleep(2)
 
 if __name__ == "__main__":

@@ -5,6 +5,6 @@ WORKDIR /app
 COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY event_generator.py /app/main.py
+COPY producer.py /app/producer.py
 
-CMD ["python", "/app/main.py"]
+CMD ["python", "/app/producer.py"]

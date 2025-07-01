@@ -72,13 +72,19 @@ services:
         superset run -h 0.0.0.0 -p 8088
       "
 
-  event-generator:
+  kafka-producer:
     build:
-      context: ./event-generator
+      context: ./kafka-producer
       dockerfile: Dockerfile
     depends_on:
       - kafka
     restart: on-failure
+    volumes:
+      - ./kafka-producer:/app  # Mount the Kafka producer folder
+    command: >
+      bash -c "
+        python /app/producer.py
+      "
 
   kafka-consumer:
     build:
@@ -88,45 +94,25 @@ services:
       - kafka
       - mongodb
     restart: on-failure
-
-  metrics-loader:
-    build:
-      context: ./metrics-loader
-      dockerfile: Dockerfile
-    depends_on:
-      - mongodb
-      - postgres
-    restart: always
     volumes:
-      - ./metrics-loader:/app  # Mount the metrics-loader folder
+      - ./kafka-consumer:/app  # Mount the Kafka consumer folder
     command: >
       bash -c "
-        /opt/spark/bin/spark-submit \
-        --master spark://spark:7077 \
-        /app/metrics_loader.py
+        python /app/consumer.py
       "
 
-  spark:
-    image: bitnami/spark:latest
-    container_name: spark
-    environment:
-      - SPARK_MODE=master
-      - SPARK_MASTER_HOST=spark
-      - SPARK_MASTER_PORT=7077
-    ports:
-      - "7077:7077"
-      - "8080:8080"
+  event-generator:
+    build:
+      context: ./event-generator
+      dockerfile: Dockerfile
     depends_on:
-      - mongodb
-      - postgres
+      - kafka
+    restart: on-failure
     volumes:
-      - ./spark:/opt/spark-apps  # Mount your Spark application folder here
+      - ./event-generator:/app  # Mount the event generator folder
     command: >
       bash -c "
-        /opt/spark/bin/spark-submit \
-        --master spark://spark:7077 \
-        --class com.example.Main \
-        /opt/spark-apps/your-spark-app.jar
+        python /app/event_generator.py
       "
 
 volumes:
